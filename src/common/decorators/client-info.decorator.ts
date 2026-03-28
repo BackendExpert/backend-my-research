@@ -1,0 +1,13 @@
+import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { ClientInfo } from "../interfaces/client-info.interface"
+
+export const ClientInfoDecorator = createParamDecorator(
+    (data: unknown, ctx: ExecutionContext): ClientInfo => {
+        const request = ctx.switchToHttp().getRequest();
+
+        return {
+            ipAddress: request.ip,
+            userAgent: request.headers['user-agent'] || '',
+        };
+    },
+);
