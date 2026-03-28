@@ -8,7 +8,6 @@ import { JwtService } from "@nestjs/jwt";
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { createAuditLog } from "src/common/utils/auditlogs.util";
 
-
 @Injectable()
 export class ProfileService {
     constructor(
@@ -53,17 +52,14 @@ export class ProfileService {
             throw new ConflictException("Profile Already Created")
         }
 
+
         const profile = new this.profileModel({
             user: user._id,
             fname: dto.fname,
             lname: dto.lname,
             bio: dto.bio,
             title: dto.title,
-            profile_img: profileImgFile,
-            education: dto.education || [],
-            work_exp: dto.work_exp || [],
-            contact_info: dto.contact_info || [],
-            skills: dto.skills || []
+            profile_img: `/uploads/profile/${profileImgFile}`,
         });
 
         const savedProfile = await profile.save();
