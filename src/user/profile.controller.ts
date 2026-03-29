@@ -9,6 +9,7 @@ import { CreateProfileDto } from "./dto/create-profile.dto";
 import { ClientInfoDecorator } from "src/common/decorators/client-info.decorator";
 import type { ClientInfo } from "src/common/interfaces/client-info.interface";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
+import { CreateEducationDTO } from "./dto/education-create.dto";
 
 @Controller('api/profile')
 
@@ -72,6 +73,29 @@ export class ProfileController {
             id,
             dto,
             file?.filename,
+            client.ipAddress,
+            client.userAgent
+        )
+    }
+
+    @Post('create-education')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @Permissions('create:education')
+
+    CreateEducation(
+        @Body() dto: CreateEducationDTO,
+        @Headers("authorization") authHeader: string,
+        @ClientInfoDecorator() client: ClientInfo,
+    ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.profileService.CreateEducation(
+            token,
+            dto,
             client.ipAddress,
             client.userAgent
         )

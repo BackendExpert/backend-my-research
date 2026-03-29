@@ -45,7 +45,7 @@ export class ContactInfo {
     linkedin: string;
 
     @Prop({ required: true })
-    twiiter: Date;
+    twiiter: string;
 
 }
 
@@ -95,13 +95,13 @@ export class Profile {
         type: [WorkExpSchema],
         default: []
     })
-    work_exp: Education[];
+    work_exp: WorkExp[];
 
     @Prop({
         type: [ContactInfoSchema],
         default: []
     })
-    contact_info: Education[];
+    contact_info: ContactInfo[];
 
     @Prop({
         type: [String],

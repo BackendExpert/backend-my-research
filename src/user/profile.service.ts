@@ -8,6 +8,7 @@ import { JwtService } from "@nestjs/jwt";
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { createAuditLog } from "src/common/utils/auditlogs.util";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
+import { CreateEducationDTO } from "./dto/education-create.dto";
 
 @Injectable()
 export class ProfileService {
@@ -147,4 +148,51 @@ export class ProfileService {
         }
 
     }
+
+
+    async CreateEducation(
+        token: string,
+        dto: CreateEducationDTO,
+        ipAddress?: string,
+        userAgent?: string
+    ) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const checkprofile = await this.profileModel.findOne({ user: user._id })
+
+        if (!checkprofile) {
+            throw new NotFoundException("Profile cannot Found")
+        }
+
+        checkprofile.education.push({
+            institute_name: dto.institute_name,
+            course: dto.course,
+            start_at: dto.start_at,
+            end_at: dto.end_at
+        });
+
+        await checkprofile.save()
+
+        await createAuditLog(this.auditlogModel, {
+            user: user._id,
+            action: "EDUCATION_UPDATED",
+            description: `User Profile ${user.email} Create New Education`,
+            ipAddress,
+            userAgent,
+            metadata: { ipAddress, userAgent }
+        });
+
+        return {
+            success: true,
+            message: "New Education Created Success"
+        }
+
+
+    }
+
 }
