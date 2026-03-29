@@ -10,6 +10,7 @@ import { createAuditLog } from "src/common/utils/auditlogs.util";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { CreateEducationDTO } from "./dto/education-create.dto";
 import { CreateContactInfoDTO } from "./dto/create-contactinfo.dto";
+import { CreateWorkExpDto } from "./dto/create-work.dto";
 
 
 
@@ -239,8 +240,54 @@ export class ProfileService {
         });
 
         return {
-            success: true, 
+            success: true,
             message: "Contact Info Created Success"
+        }
+
+    }
+
+    async CreateWorkExp(
+        token: string,
+        dto: CreateWorkExpDto,
+        ipAddress?: string,
+        userAgent?: string
+    ) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const checkprofile = await this.profileModel.findOne({ user: user._id })
+
+        if (!checkprofile) {
+            throw new NotFoundException("Profile cannot Found")
+        }
+
+        checkprofile.work_exp.push({
+            work_place: dto.work_place,
+            job: dto.job,
+            city: dto.city,
+            country: dto.country,
+            start_at: dto.start_at,
+            end_at: dto.end_at
+        });
+
+        await checkprofile.save()
+
+        await createAuditLog(this.auditlogModel, {
+            user: user._id,
+            action: "WORK_EXP_ADDED",
+            description: `User Profile ${user.email} Work Exp added Success`,
+            ipAddress,
+            userAgent,
+            metadata: { ipAddress, userAgent }
+        });
+
+        return {
+            success: true,
+            message: "Work Exp Added Success"
         }
 
     }

@@ -32,6 +32,13 @@ export class WorkExp {
     @Prop({ required: true, trim: true })
     job: string;
 
+    @Prop({ required: true, trim: true })
+    city: string;
+
+    @Prop({ required: true, trim: true })
+    country: string;
+
+
     @Prop({ required: true })
     start_at: Date;
 

@@ -111,6 +111,17 @@ export class ProfileController {
         @Headers("authorization") authHeader: string,
         @ClientInfoDecorator() client: ClientInfo,
     ) {
-        
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.profileService.ContactInfo(
+            token,
+            dto,
+            client.ipAddress,
+            client.userAgent
+        )
     }
 }
