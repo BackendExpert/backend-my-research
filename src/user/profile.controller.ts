@@ -11,6 +11,7 @@ import type { ClientInfo } from "src/common/interfaces/client-info.interface";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { CreateEducationDTO } from "./dto/education-create.dto";
 import { CreateContactInfoDTO } from "./dto/create-contactinfo.dto";
+import { CreateWorkExpDto } from "./dto/create-work.dto";
 
 @Controller('api/profile')
 
@@ -124,4 +125,28 @@ export class ProfileController {
             client.userAgent
         )
     }
+
+    @Post('create-workexp')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @Permissions('create:workexp')
+
+    CreateWorkExp(
+        @Body() dto: CreateWorkExpDto,
+        @Headers("authorization") authHeader: string,
+        @ClientInfoDecorator() client: ClientInfo,
+    ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.profileService.CreateWorkExp(
+            token,
+            dto,
+            client.ipAddress,
+            client.userAgent
+        )
+    }
+
 }
