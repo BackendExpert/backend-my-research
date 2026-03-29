@@ -7,6 +7,7 @@ import { AuditLog, AuditLogDocument } from "src/auditlogs/schema/auditlog.schema
 import { JwtService } from "@nestjs/jwt";
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { createAuditLog } from "src/common/utils/auditlogs.util";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 
 @Injectable()
 export class ProfileService {
@@ -77,5 +78,73 @@ export class ProfileService {
             success: true,
             message: "Profile Created Success"
         }
+    }
+
+    async UpdateProfile(
+        token: string,
+        id: string,
+        dto: UpdateProfileDto,
+        profileImgFile?: string,
+        ipAddress?: string,
+        userAgent?: string
+    ) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const checkProfile = await this.profileModel.findOne({ user: user._id })
+
+        if (!checkProfile) {
+            await createAuditLog(this.auditlogModel, {
+                user: user._id,
+                action: "NO_PROFILE_TO_UPDATE",
+                description: `User ${user.email} try to update unknown Profile`,
+                ipAddress,
+                userAgent,
+                metadata: { ipAddress, userAgent }
+            });
+
+            throw new NotFoundException("Profile Cannot Found")
+        }
+
+        const updateData: any = {}
+
+        if (dto.fname !== undefined)
+            updateData.fname = dto.fname
+
+        if (dto.lname !== undefined)
+            updateData.lname = dto.lname
+
+        if (dto.bio !== undefined)
+            updateData.bio = dto.bio
+
+        if (profileImgFile) {
+            updateData.profile_img = `/uploads/cv/${profileImgFile}`
+        }
+
+        const updatedProfile = await this.profileModel.findByIdAndUpdate(
+            id,
+            updateData,
+            { new: true }
+        )
+
+
+        await createAuditLog(this.auditlogModel, {
+            user: user._id,
+            action: "PROFILE_UPDATED",
+            description: `User Profile ${user.email} Updated`,
+            ipAddress,
+            userAgent,
+            metadata: { ipAddress, userAgent }
+        });
+
+        return {
+            success: true,
+            message: "Profile Updated Success"
+        }
+
     }
 }

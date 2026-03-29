@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Headers, Post, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Headers, Param, Patch, Post, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ProfileService } from "./profile.service";
 import { JwtAuthGuard } from "src/common/guard/jwt-auth.guard";
 import { PermissionsGuard } from "src/common/guard/permissions.guard";
@@ -8,6 +8,7 @@ import { Permissions } from "src/common/decorators/permissions.decorator";
 import { CreateProfileDto } from "./dto/create-profile.dto";
 import { ClientInfoDecorator } from "src/common/decorators/client-info.decorator";
 import type { ClientInfo } from "src/common/interfaces/client-info.interface";
+import { UpdateProfileDto } from "./dto/update-profile.dto";
 
 @Controller('api/profile')
 
@@ -45,5 +46,34 @@ export class ProfileController {
             client.userAgent
         )
 
+    }
+
+
+    @Patch('update-profile/:id')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @UseInterceptors(FileInterceptor('profile-img', imageUploadOptions))
+    @Permissions('update:profile')
+
+    UpdateProfile(
+        @Body() dto: UpdateProfileDto,
+        @Param('id') id: string,
+        @Headers("authorization") authHeader: string,
+        @UploadedFile() file: Express.Multer.File,
+        @ClientInfoDecorator() client: ClientInfo,
+    ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.profileService.UpdateProfile(
+            token,
+            id,
+            dto,
+            file?.filename,
+            client.ipAddress,
+            client.userAgent
+        )
     }
 }
