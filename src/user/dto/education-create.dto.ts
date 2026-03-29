@@ -8,6 +8,12 @@ export class CreateEducationDTO {
     @IsString()
     course: string;
 
+    @IsString()
+    city: string;
+
+    @IsString()
+    country: string;
+
     @Type(() => Date)
     @IsDate()
     start_at: Date;

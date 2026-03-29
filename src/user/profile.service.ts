@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { User, UserDocument } from "./schema/user.schema";
 import { Model } from "mongoose";
@@ -9,6 +9,9 @@ import { CreateProfileDto } from "./dto/create-profile.dto";
 import { createAuditLog } from "src/common/utils/auditlogs.util";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { CreateEducationDTO } from "./dto/education-create.dto";
+import { CreateContactInfoDTO } from "./dto/create-contactinfo.dto";
+
+
 
 @Injectable()
 export class ProfileService {
@@ -172,6 +175,8 @@ export class ProfileService {
         checkprofile.education.push({
             institute_name: dto.institute_name,
             course: dto.course,
+            city: dto.city,
+            country: dto.country,
             start_at: dto.start_at,
             end_at: dto.end_at
         });
@@ -191,8 +196,54 @@ export class ProfileService {
             success: true,
             message: "New Education Created Success"
         }
+    }
 
+    async ContactInfo(
+        token: string,
+        dto: CreateContactInfoDTO,
+        ipAddress?: string,
+        userAgent?: string
+    ) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const checkprofile = await this.profileModel.findOne({ user: user._id })
+
+        if (!checkprofile) {
+            throw new NotFoundException("Profile cannot Found")
+        }
+
+        if (checkprofile.contact_info) {
+            throw new BadRequestException("Contact info already exists. Use update.");
+        }
+
+        checkprofile.contact_info = {
+            website: dto.website,
+            linkedin: dto.linkedin,
+            twitter: dto.twitter
+        };
+
+        await checkprofile.save()
+
+        await createAuditLog(this.auditlogModel, {
+            user: user._id,
+            action: "CONTACT_INFO_CREATED",
+            description: `User Profile ${user.email} Create Contact Info`,
+            ipAddress,
+            userAgent,
+            metadata: { ipAddress, userAgent }
+        });
+
+        return {
+            success: true, 
+            message: "Contact Info Created Success"
+        }
 
     }
+
 
 }

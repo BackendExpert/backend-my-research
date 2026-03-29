@@ -1,14 +1,19 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { Types, Document } from "mongoose";
 
-
-@Schema({ _id: false })
+@Schema({ _id: true })
 export class Education {
     @Prop({ required: true, trim: true })
     institute_name: string;
 
     @Prop({ required: true, trim: true })
     course: string;
+
+    @Prop({ required: true, trim: true })
+    city: string;
+
+    @Prop({ required: true, trim: true })
+    country: string;
 
     @Prop({ required: true })
     start_at: Date;
@@ -19,7 +24,7 @@ export class Education {
 
 export const EducationSchema = SchemaFactory.createForClass(Education);
 
-@Schema({ _id: false })
+@Schema({ _id: true })
 export class WorkExp {
     @Prop({ required: true, trim: true })
     work_place: string;
@@ -44,19 +49,16 @@ export class ContactInfo {
     @Prop({ required: true, trim: true })
     linkedin: string;
 
-    @Prop({ required: true })
-    twiiter: string;
-
+    @Prop({ required: true, trim: true })
+    twitter: string;
 }
 
 export const ContactInfoSchema = SchemaFactory.createForClass(ContactInfo);
-
 
 export type ProfileDocument = Profile & Document;
 
 @Schema({ timestamps: true })
 export class Profile {
-
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
     user: Types.ObjectId;
 
@@ -66,7 +68,7 @@ export class Profile {
     @Prop({ required: true, trim: true })
     lname: string;
 
-    @Prop({ required: true })
+    @Prop({ required: true, trim: true })
     bio: string;
 
     @Prop({
@@ -98,10 +100,10 @@ export class Profile {
     work_exp: WorkExp[];
 
     @Prop({
-        type: [ContactInfoSchema],
-        default: []
+        type: ContactInfoSchema,
+        default: null
     })
-    contact_info: ContactInfo[];
+    contact_info: ContactInfo;
 
     @Prop({
         type: [String],

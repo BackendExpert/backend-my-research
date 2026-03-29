@@ -10,6 +10,7 @@ import { ClientInfoDecorator } from "src/common/decorators/client-info.decorator
 import type { ClientInfo } from "src/common/interfaces/client-info.interface";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { CreateEducationDTO } from "./dto/education-create.dto";
+import { CreateContactInfoDTO } from "./dto/create-contactinfo.dto";
 
 @Controller('api/profile')
 
@@ -99,5 +100,17 @@ export class ProfileController {
             client.ipAddress,
             client.userAgent
         )
+    }
+
+    @Post('create-contacts')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @Permissions('create:contact-info')
+
+    CreateContactInfo(
+        @Body() dto: CreateContactInfoDTO,
+        @Headers("authorization") authHeader: string,
+        @ClientInfoDecorator() client: ClientInfo,
+    ) {
+        
     }
 }
