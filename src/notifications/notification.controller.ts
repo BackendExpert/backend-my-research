@@ -1,4 +1,4 @@
-import { Controller, Headers, Param, Post, UnauthorizedException, UseGuards } from "@nestjs/common";
+import { Controller, Get, Headers, Param, Post, UnauthorizedException, UseGuards } from "@nestjs/common";
 import { ClientInfoDecorator } from "src/common/decorators/client-info.decorator";
 import { Permissions } from "src/common/decorators/permissions.decorator";
 import { JwtAuthGuard } from "src/common/guard/jwt-auth.guard";
@@ -32,6 +32,44 @@ export class NotificationController {
             id,
             client.ipAddress,
             client.userAgent
+        )
+    }
+
+    @Get('notifications')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @Permissions('get:notification')
+
+    FetchAllNotifications(
+        @Headers("authorization") authHeader: string,
+        @ClientInfoDecorator() client: ClientInfo,
+    ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.notificationService.GetAllNotification(token)
+    }
+
+    @Get('notification/:id')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @Permissions('get:one-notification')
+
+    FetchOneNotification(
+        @Param('id') id: string,
+        @Headers("authorization") authHeader: string,
+        @ClientInfoDecorator() client: ClientInfo,
+    ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.notificationService.GetNotificationById(
+            token,
+            id
         )
     }
 }

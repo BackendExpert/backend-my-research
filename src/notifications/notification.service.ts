@@ -62,6 +62,52 @@ export class NotificationService {
             success: true,
             message: "Notification Read Success"
         }
+    }
+
+    async GetAllNotification(
+        token: string,
+    ) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const getallnotifications = await this.notificationModel.find({ user: user._id })
+
+        return {
+            success: true,
+            result: getallnotifications,
+            message: "All Notifications Fetched Success"
+        }
+    }
+
+    async GetNotificationById(
+        token: string,
+        id: string
+    ) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const notification = await this.notificationModel.findOne({
+            _id: id,
+            user: user._id
+        });
+
+        if (!notification) {
+            throw new NotFoundException("Notification not found or you do not have access");
+        }
+
+        return {
+            success: true,
+            result: notification,
+            message: "Notification Fetched Success"
+        }
 
     }
 
