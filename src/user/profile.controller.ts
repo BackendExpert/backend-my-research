@@ -171,4 +171,27 @@ export class ProfileController {
             client.userAgent
         )
     }
+
+    @Post('following')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @Permissions('create:follow')
+
+    createFollow(
+        @Body('memberId') memberid: string,
+        @Headers("authorization") authHeader: string,
+        @ClientInfoDecorator() client: ClientInfo,
+    ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.profileService.FollowMember(
+            token,
+            memberid,
+            client.ipAddress,
+            client.userAgent
+        )
+    }
 }
