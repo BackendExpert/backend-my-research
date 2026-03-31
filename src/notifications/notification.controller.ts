@@ -6,7 +6,7 @@ import { PermissionsGuard } from "src/common/guard/permissions.guard";
 import type { ClientInfo } from "src/common/interfaces/client-info.interface";
 import { NotificationService } from "./notification.service";
 
-@Controller()
+@Controller('api/notification')
 export class NotificationController {
     constructor(
         private readonly notificationService: NotificationService
@@ -17,7 +17,7 @@ export class NotificationController {
     @Permissions('read:notification')
 
     ReadNotification(
-        @Param(':id') id: string,
+        @Param('id') id: string,
         @Headers("authorization") authHeader: string,
         @ClientInfoDecorator() client: ClientInfo,
     ) {

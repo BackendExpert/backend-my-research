@@ -55,7 +55,7 @@ export class NotificationService {
             throw new ForbiddenException("You cannot access this notification");
         }
 
-        checknotification.isRead === true
+        checknotification.isRead = true
         await checknotification.save()
 
         return {
