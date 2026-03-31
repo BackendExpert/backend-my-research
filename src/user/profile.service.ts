@@ -11,6 +11,8 @@ import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { CreateEducationDTO } from "./dto/education-create.dto";
 import { CreateContactInfoDTO } from "./dto/create-contactinfo.dto";
 import { CreateWorkExpDto } from "./dto/create-work.dto";
+import { CreateNotification } from "src/common/utils/notification.util";
+import { Notification, NotificationDocument } from "src/notifications/schema/notification.schema";
 
 
 
@@ -25,6 +27,9 @@ export class ProfileService {
 
         @InjectModel(AuditLog.name, 'local')
         private auditlogModel: Model<AuditLogDocument>,
+
+        @InjectModel(Notification.name, 'local')
+        private notificationModel: Model<NotificationDocument>,
 
         private readonly jwtService: JwtService,
     ) { }
@@ -288,6 +293,109 @@ export class ProfileService {
         return {
             success: true,
             message: "Work Exp Added Success"
+        }
+
+    }
+
+    async UpdateSkills(
+        token: string,
+        skills: string[],
+        ipAddress?: string,
+        userAgent?: string
+    ) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const checkprofile = await this.profileModel.findOne({ user: user._id })
+
+        if (!checkprofile) {
+            throw new NotFoundException("Profile cannot Found")
+        }
+
+        checkprofile.skills = skills
+
+        await checkprofile.save()
+
+        await createAuditLog(this.auditlogModel, {
+            user: user._id,
+            action: "SKILLS_UPDATED",
+            description: `User Profile ${user.email} Skills Updated Success`,
+            ipAddress,
+            userAgent,
+            metadata: { ipAddress, userAgent }
+        });
+
+        return {
+            success: true,
+            message: "Skills Updated Success"
+        }
+    }
+
+    async FollowMember(
+        token: string,
+        memberid: string,
+        ipAddress?: string,
+        userAgent?: string
+    ) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const checkprofile = await this.profileModel.findOne({ user: user._id })
+
+        if (!checkprofile) {
+            throw new NotFoundException("Profile cannot Found")
+        }
+
+        const targetUser = await this.userModel.findById(memberid)
+        if (!targetUser) {
+            throw new NotFoundException("Target User Not Found")
+        }
+
+        const targetProfile = await this.profileModel.findOne({ user: targetUser._id })
+        if (!targetProfile) {
+            throw new NotFoundException("Target Profile Not Found")
+        }
+
+        // prevent self-follwing
+
+        if (user._id.toString() === targetUser._id.toString()) {
+            throw new BadRequestException("You cannot follow yourself")
+        }
+
+        // already following
+
+        const alreadyFollowing = checkprofile.followings.includes(targetUser._id)
+        if (alreadyFollowing) {
+            throw new BadRequestException("Already following this user")
+        }
+
+        checkprofile.followings.push(targetUser._id)
+
+        targetProfile.followers.push(user._id)
+
+        await checkprofile.save()
+        await targetProfile.save()
+
+        await CreateNotification(this.notificationModel, {
+            user: user._id,
+            title: 'You Start Follow ${targetProfile.fname} ${targetProfile.lname}',
+            message: "You have been Start Following ${targetProfile.fname} ${targetProfile.lname}",
+            type: "allocation",
+            refId: checkprofile._id,
+            refModel: "Profile",
+        });
+
+        return {
+            succes: true,
+            message: "Followed Success"
         }
 
     }

@@ -9,6 +9,8 @@ import { ProfileController } from "./profile.controller";
 import { ProfileService } from "./profile.service";
 import { JwtAuthGuard } from "src/common/guard/jwt-auth.guard";
 import { PermissionsGuard } from "src/common/guard/permissions.guard";
+import { Notification, NotificationSchema } from "src/notifications/schema/notification.schema";
+
 
 @Module({
     imports: [
@@ -18,6 +20,7 @@ import { PermissionsGuard } from "src/common/guard/permissions.guard";
             {name: User.name, schema: UserSchema },
             {name: Profile.name, schema: ProfileSchema },
             {name: AuditLog.name, schema: AuditLogSchema },
+            {name: Notification.name, schema: NotificationSchema },
         ], 'local')
     ],
     controllers: [ProfileController],

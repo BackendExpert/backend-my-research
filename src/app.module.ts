@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { AuthModule } from './auth/auth.module';
 import { ProfileModule } from './user/profile.module';
+import { NotificationModule } from './notifications/notification.module';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { ProfileModule } from './user/profile.module';
     ScheduleModule.forRoot(),
     DatabaseModule,
     AuthModule,
-    ProfileModule
+    ProfileModule,
+    NotificationModule
   ],
   controllers: [AppController],
   providers: [AppService],

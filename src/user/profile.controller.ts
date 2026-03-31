@@ -149,4 +149,26 @@ export class ProfileController {
         )
     }
 
+    @Patch('update-skills')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @Permissions('update:skills')
+
+    UpdateSkills(
+        @Body('skills') skills: string[],
+        @Headers("authorization") authHeader: string,
+        @ClientInfoDecorator() client: ClientInfo,
+    ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.profileService.UpdateSkills(
+            token,
+            skills,
+            client.ipAddress,
+            client.userAgent
+        )
+    }
 }
