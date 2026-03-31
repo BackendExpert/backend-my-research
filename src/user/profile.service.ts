@@ -386,9 +386,18 @@ export class ProfileService {
 
         await CreateNotification(this.notificationModel, {
             user: user._id,
-            title: 'You Start Follow ${targetProfile.fname} ${targetProfile.lname}',
-            message: "You have been Start Following ${targetProfile.fname} ${targetProfile.lname}",
-            type: "allocation",
+            title: `You started following ${targetProfile.fname} ${targetProfile.lname}`,
+            message: `You are now following ${targetProfile.fname} ${targetProfile.lname}`,
+            type: "follow",
+            refId: targetProfile._id,
+            refModel: "Profile",
+        });
+
+        await CreateNotification(this.notificationModel, {
+            user: targetUser._id,
+            title: `${checkprofile.fname} ${checkprofile.lname} started following you`,
+            message: `${checkprofile.fname} ${checkprofile.lname} is now following you`,
+            type: "follow",
             refId: checkprofile._id,
             refModel: "Profile",
         });
