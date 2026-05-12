@@ -19,10 +19,10 @@ export class Role {
             'guest'
         ]
     })
-    role: string;
+    role!: string;
 
     @Prop({ type: [String], default: [] })
-    permissions: string[];
+    permissions!: string[];
 }
 
 export const RoleSchema = SchemaFactory.createForClass(Role);

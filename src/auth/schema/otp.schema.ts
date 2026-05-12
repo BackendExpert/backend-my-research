@@ -7,13 +7,13 @@ export type OTPDocument = OTP & Document
 
 export class OTP {
     @Prop({ unique: true, required: true })
-    email: string;
+    email!: string;
 
     @Prop({ required: true })
-    otp: string;
+    otp!: string;
 
     @Prop({ required: true })
-    expireAt: Date;
+    expireAt!: Date;
 }
 
 export const OTPSchema = SchemaFactory.createForClass(OTP);

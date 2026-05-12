@@ -7,19 +7,19 @@ export type NotificationDocument = Notification & Document;
 export class Notification {
 
     @Prop({ type: Types.ObjectId, ref: "User", required: true })
-    user: Types.ObjectId;
+    user!: Types.ObjectId;
 
     @Prop({ required: true })
-    title: string;
+    title!: string;
 
     @Prop({ required: true })
-    message: string;
+    message!: string;
 
     @Prop({ default: false })
-    isRead: boolean;
+    isRead!: boolean;
 
     @Prop({ default: "general" })
-    type: string; 
+    type!: string; 
 
     @Prop({ type: Types.ObjectId, refPath: "refModel", required: false })
     refId?: Types.ObjectId;

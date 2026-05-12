@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Headers, Param, Patch, Post, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { BadRequestException, Body, Controller, Get, Headers, Param, Patch, Post, UnauthorizedException, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { ProfileService } from "./profile.service";
 import { JwtAuthGuard } from "src/common/guard/jwt-auth.guard";
 import { PermissionsGuard } from "src/common/guard/permissions.guard";
@@ -193,5 +193,22 @@ export class ProfileController {
             client.ipAddress,
             client.userAgent
         )
+    }
+
+    
+    @Get('my-profile')
+    @UseGuards(JwtAuthGuard, PermissionsGuard)
+    @Permissions('get:profile')
+
+    fetchMyProfile (
+        @Headers("authorization") authHeader: string,
+    ) {
+        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedException("Invalid or missing token");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        return this.profileService.GetProfileData(token)
     }
 }

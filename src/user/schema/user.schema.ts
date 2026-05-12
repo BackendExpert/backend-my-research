@@ -6,19 +6,19 @@ export type UserDocument = User & Document;
 @Schema({ timestamps: true })
 export class User {
     @Prop({ unique: true, required: true })
-    email: string;
+    email!: string;
 
     @Prop()
-    phone: string;
+    phone!: string;
 
     @Prop({ type: Types.ObjectId, ref: 'Role', required: true })
-    role: Types.ObjectId;
+    role!: Types.ObjectId;
     
     @Prop({ required: true, default: new Date() })
-    last_login: Date
+    last_login!: Date
 
     @Prop({ default: true })
-    isActive: boolean;
+    isActive!: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -410,4 +410,21 @@ export class ProfileService {
     }
 
 
+    async GetProfileData  (token: string) {
+        const payload = await this.jwtService.verify(token)
+        const user = await this.userModel.findOne({ email: payload.user })
+
+        if (!user) {
+            throw new NotFoundException("The User Not Found")
+        }
+
+        const getprofile = await this.profileModel.findOne({ user: user._id })
+
+        return {
+            success: true, 
+            message: "Profile Fetched Success",
+            result: getprofile
+        }
+    }
+
 }

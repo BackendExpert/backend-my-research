@@ -4,22 +4,22 @@ import { Types, Document } from "mongoose";
 @Schema({ _id: true })
 export class Education {
     @Prop({ required: true, trim: true })
-    institute_name: string;
+    institute_name!: string;
 
     @Prop({ required: true, trim: true })
-    course: string;
+    course!: string;
 
     @Prop({ required: true, trim: true })
-    city: string;
+    city!: string;
 
     @Prop({ required: true, trim: true })
-    country: string;
+    country!: string;
 
     @Prop({ required: true })
-    start_at: Date;
+    start_at!: Date;
 
     @Prop()
-    end_at: Date;
+    end_at!: Date;
 }
 
 export const EducationSchema = SchemaFactory.createForClass(Education);
@@ -27,23 +27,23 @@ export const EducationSchema = SchemaFactory.createForClass(Education);
 @Schema({ _id: true })
 export class WorkExp {
     @Prop({ required: true, trim: true })
-    work_place: string;
+    work_place!: string;
 
     @Prop({ required: true, trim: true })
-    job: string;
+    job!: string;
 
     @Prop({ required: true, trim: true })
-    city: string;
+    city!: string;
 
     @Prop({ required: true, trim: true })
-    country: string;
+    country!: string;
 
 
     @Prop({ required: true })
-    start_at: Date;
+    start_at!: Date;
 
     @Prop()
-    end_at: Date;
+    end_at!: Date;
 }
 
 export const WorkExpSchema = SchemaFactory.createForClass(WorkExp);
@@ -51,13 +51,13 @@ export const WorkExpSchema = SchemaFactory.createForClass(WorkExp);
 @Schema({ _id: false })
 export class ContactInfo {
     @Prop({ required: true, trim: true })
-    website: string;
+    website!: string;
 
     @Prop({ required: true, trim: true })
-    linkedin: string;
+    linkedin!: string;
 
     @Prop({ required: true, trim: true })
-    twitter: string;
+    twitter!: string;
 }
 
 export const ContactInfoSchema = SchemaFactory.createForClass(ContactInfo);
@@ -67,16 +67,16 @@ export type ProfileDocument = Profile & Document;
 @Schema({ timestamps: true })
 export class Profile {
     @Prop({ type: Types.ObjectId, ref: 'User', required: true })
-    user: Types.ObjectId;
+    user!: Types.ObjectId;
 
     @Prop({ required: true, trim: true })
-    fname: string;
+    fname!: string;
 
     @Prop({ required: true, trim: true })
-    lname: string;
+    lname!: string;
 
     @Prop({ required: true, trim: true })
-    bio: string;
+    bio!: string;
 
     @Prop({
         type: String,
@@ -92,25 +92,25 @@ export class Profile {
         ],
         default: "Mr"
     })
-    title: string;
+    title!: string;
 
     @Prop({
         type: [EducationSchema],
         default: []
     })
-    education: Education[];
+    education!: Education[];
 
     @Prop({
         type: [WorkExpSchema],
         default: []
     })
-    work_exp: WorkExp[];
+    work_exp!: WorkExp[];
 
     @Prop({
         type: ContactInfoSchema,
         default: null
     })
-    contact_info: ContactInfo;
+    contact_info!: ContactInfo;
 
     @Prop({
         type: [String],
@@ -120,16 +120,16 @@ export class Profile {
             message: 'Maximum 30 skills allowed'
         }
     })
-    skills: string[];
+    skills!: string[];
 
     @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
-    followers: Types.ObjectId[];
+    followers!: Types.ObjectId[];
 
     @Prop({ type: [{ type: Types.ObjectId, ref: 'User' }], default: [] })
-    followings: Types.ObjectId[];
+    followings!: Types.ObjectId[];
 
     @Prop({ required: true })
-    profile_img: string;
+    profile_img!: string;
 }
 
 export const ProfileSchema = SchemaFactory.createForClass(Profile);
